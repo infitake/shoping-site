@@ -10,11 +10,11 @@
         <form class="login-form" action="/login" method="POST" novalidate>
             <div class="form-control">
                 <label for="email">E-Mail</label>
-                <input type="email" name="email" id="email">
+                <input class="<%= validError.find(e => e.param === 'email') ? 'validate' : '' %>" type="email" name="email" id="email" value="<%= userInput.email %>">
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password">
+                <input class="<%= validError.find(e => e.param === 'password') ? 'validate' : '' %>" type="password" name="password" id="password" value="<%= userInput.password %>">
             </div>
             <div class="form-control">
                <a href="/reset"><span>forget password?</span> </a>

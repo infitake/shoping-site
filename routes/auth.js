@@ -10,7 +10,36 @@ const router = express.Router();
 
 router.get('/login', authController.getLogin);
 
-router.post('/login', authController.postLogin);
+router.post('/login', [
+    check('email')
+    .isEmail()
+    .withMessage("The Email Id is not Right")
+    .normalizeEmail()
+    .custom((value, {req}) => {
+        return User.findOne({ email: value })
+            .then(userDoc => {
+                if(!userDoc){
+              return Promise.reject(
+                  'Email is not  exits'
+              )
+                }
+        })
+    }),
+    body('password')
+    .isLength({min: 6})
+    .isAlphanumeric()
+    .withMessage("This Password is not correct")
+    // .custom((value, {req}) => {
+    //     return User.find({email: req.body.email})
+    //         .then(userDoc => {
+    //                 if(value !== req.body.password){
+    //                     throw new Error("Password not match");
+    //                 }
+    //                 return true;
+    //     })
+    // })
+],
+authController.postLogin);
 
 router.get('/signup', authController.getSignup);
 
@@ -29,7 +58,8 @@ router.post('/signup', [
           )
             }
     })
-}),
+})
+.normalizeEmail(),
     body('password',
     "Password must be of 6 length and having alpha numeric value")
     .isLength({min: 6})

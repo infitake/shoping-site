@@ -2,6 +2,8 @@ const path = require('path');
 
 const express = require('express');
 
+const { check, body } = require('express-validator/check');
+
 const shopController = require('../controllers/shop');
 
 const isAuth = require('../middleware/isAuth');

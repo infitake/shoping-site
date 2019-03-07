@@ -22,7 +22,7 @@
   outline-color: #00695c;
 }
 
-.login-form .container .errorMessage{
+ .container .errorMessage{
   margin: 20px;
   color: red;
 }
@@ -30,6 +30,7 @@
   text-decoration: none;
 }
 
-.form-control .validate {
+ .form-control .validate {
   border-color: red;
 }
+
