@@ -29,3 +29,7 @@
 .form-control a{
   text-decoration: none;
 }
+
+.form-control .validate {
+  border-color: red;
+}

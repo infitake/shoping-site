@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 
+const { validationResult } = require('express-validator/check');
+
 const crypto = require('crypto');
 // const sendgridTransport = require('nodemailer-sendgrid-transport');
 const User = require('../models/user');
@@ -48,7 +50,14 @@ exports.getSignup = (req, res, next) => {
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
-    errorMessage: message
+    errorMessage: message,
+    userInput: {
+      name: "",
+      email: "",
+      password: "",
+      conform_password: ""
+    },
+    validError: []
   });
 };
 
@@ -89,17 +98,24 @@ exports.postSignup = (req, res, next) => {
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
-  User.findOne({ email: email })
-    .then(userDoc => {
-      if (userDoc) {
-        req.flash(
-          'error',
-          'E-Mail exists already, please pick a different one.'
-        );
-        return res.redirect('/signup');
-      }
-      return bcrypt
+  const conform_password = req.body.conform_password;
+  const error = validationResult(req);
+  if(!error.isEmpty()){
+    console.log(error.array())
+    return res.status(422).render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      errorMessage: error.array()[0].msg,
+      userInput: {
+        name: username,
+        email: email,
+        password: password,
+        conform_password: conform_password
+      },
+      validError: error.array()
+    });
+  }
+    return  bcrypt
         .hash(password, 12)
         .then(hashedPassword => {
           const user = new User({
@@ -126,12 +142,7 @@ exports.postSignup = (req, res, next) => {
           });
         })
         .catch(err => {
-          console.log(err);
-        });
-    })
-    .catch(err => {
-      console.log(err);
-    });
+          console.log(err);})
 };
 
 exports.postLogout = (req, res, next) => {

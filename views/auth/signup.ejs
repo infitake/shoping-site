@@ -7,22 +7,42 @@
    <%- include('../includes/navigation.ejs') %>
 
     <main>
-        <form class="login-form" action="/signup" method="POST">
+        <form class="login-form" action="/signup" method="POST" novalidate>
             <div class="form-control">
                 <label for="username">UserName</label>
-                <input type="text" name="username" id="username">
+                <input
+                    class="<%= validError.find(e => e.param === 'username')? 'validate': ''%>"
+                    type="text"
+                    name="username" 
+                    id="username"
+                    value="<%= userInput.name %>">
             </div>
             <div class="form-control">
                 <label for="email">E-Mail</label>
-                <input type="email" name="email" id="email">
+                <input 
+                    class="<%= validError.find(e => e.param === 'email')? 'validate': ''%>" 
+                    type="email" 
+                    name="email" 
+                    id="email" 
+                    value="<%= userInput.email %>">
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password">
+                <input 
+                    class="<%= validError.find(e => e.param === 'password')? 'validate': ''%>"
+                    type="password" 
+                    name="password" 
+                    id="password" 
+                    value="<%= userInput.password %>">
             </div>
             <div class="form-control">
                 <label for="conform_password">Conform Password</label>
-                <input type="password" name="conform_password" id="conform_password">
+                <input 
+                    class="<%= validError.find(e => e.param === 'conform_password')? 'validate': ''%>"
+                    type="password" 
+                    name="conform_password" 
+                    id="conform_password" 
+                    value="<%= userInput.conform_password %>">
             </div>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button class="btn" type="submit">Signup</button>
