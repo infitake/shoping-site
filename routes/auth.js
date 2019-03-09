@@ -1,97 +1,77 @@
 const express = require('express');
-
-const authController = require('../controllers/auth');
-
 const { check, body } = require('express-validator/check');
 
+const authController = require('../controllers/auth');
 const User = require('../models/user');
 
 const router = express.Router();
 
 router.get('/login', authController.getLogin);
 
-router.post('/login', [
-    check('email')
-    .isEmail()
-    .withMessage("The Email Id is not Right")
-    .normalizeEmail()
-    .custom((value, {req}) => {
-        return User.findOne({ email: value })
-            .then(userDoc => {
-                if(!userDoc){
-              return Promise.reject(
-                  'Email is not  exits'
-              )
-                }
-        })
-    }),
-    body('password')
-    .isLength({min: 6})
-    .isAlphanumeric()
-    .withMessage("This Password is not correct")
-    // .custom((value, {req}) => {
-    //     return User.find({email: req.body.email})
-    //         .then(userDoc => {
-    //                 if(value !== req.body.password){
-    //                     throw new Error("Password not match");
-    //                 }
-    //                 return true;
-    //     })
-    // })
-],
-authController.postLogin);
-
 router.get('/signup', authController.getSignup);
 
-router.get('/resetPassword/:token', authController.getresetPassword);
+router.post(
+  '/login',
+  [
+    body('email')
+      .isEmail()
+      .withMessage('Please enter a valid email address.')
+      .normalizeEmail(),
+    body('password', 'Password has to be valid.')
+      .isLength({ min: 5 })
+      .isAlphanumeric()
+      .trim()
+  ],
+  authController.postLogin
+);
 
-router.post('/signup', [
+router.post(
+  '/signup',
+  [
     check('email')
-    .isEmail()
-    .withMessage("The Email Id is not Right")
-    .custom((value, {req}) => {
-    return User.findOne({ email: value })
-        .then(userDoc => {
-            if(userDoc){
-          return Promise.reject(
-              'Email is already exits'
-          )
-            }
-    })
-})
-.normalizeEmail(),
-    body('password',
-    "Password must be of 6 length and having alpha numeric value")
-    .isLength({min: 6})
-    .isAlphanumeric(),
-    body('conform_password')
-    .custom((value,{req}) => {
-        if( value !== req.body.password){
-            throw new Error("Password not match");
+      .isEmail()
+      .withMessage('Please enter a valid email.')
+      .custom((value, { req }) => {
+        // if (value === 'test@test.com') {
+        //   throw new Error('This email address if forbidden.');
+        // }
+        // return true;
+        return User.findOne({ email: value }).then(userDoc => {
+          if (userDoc) {
+            return Promise.reject(
+              'E-Mail exists already, please pick a different one.'
+            );
+          }
+        });
+      })
+      .normalizeEmail(),
+    body(
+      'password',
+      'Please enter a password with only numbers and text and at least 5 characters.'
+    )
+      .isLength({ min: 5 })
+      .isAlphanumeric()
+      .trim(),
+    body('confirmPassword')
+      .trim()
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error('Passwords have to match!');
         }
         return true;
-    }),
-    body('username')
-    .custom((value, {req}) => {
-        return User.findOne({name : value})
-        .then(uname => {
-            if(uname){
-                return Promise.reject(
-                    'This Username is already exits'
-                )
-            }
-        }) 
-    })
-    ], 
-    authController.postSignup);
+      })
+  ],
+  authController.postSignup
+);
+
+router.post('/logout', authController.postLogout);
 
 router.get('/reset', authController.getReset);
 
 router.post('/reset', authController.postReset);
 
-router.post('/resetPassword', authController.postresetPassword);
+router.get('/reset/:token', authController.getNewPassword);
 
-router.post('/logout', authController.postLogout);
-
+router.post('/new-password', authController.postNewPassword);
 
 module.exports = router;

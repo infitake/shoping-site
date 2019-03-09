@@ -22,15 +22,7 @@
   outline-color: #00695c;
 }
 
- .container .errorMessage{
-  margin: 20px;
-  color: red;
-}
-.form-control a{
-  text-decoration: none;
-}
-
- .form-control .validate {
+.form-control input.invalid,
+.form-control textarea.invalid {
   border-color: red;
 }
-
