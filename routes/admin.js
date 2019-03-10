@@ -49,6 +49,7 @@ router.post(
   adminController.postEditProduct
 );
 
-router.post('/delete-product', isAuth, adminController.postDeleteProduct);
+// we use router.delete for the asynchrous javascript
+router.delete('/product/:productId', isAuth, adminController.deleteProduct);
 
 module.exports = router;
