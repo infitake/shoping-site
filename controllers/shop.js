@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PDFDocument = require('pdfkit');
-
+const stripe = require("stripe")("sk_test_8k1vBevQAO1bSPxtrNFi45HV");
 const Product = require('../models/product');
 const Order = require('../models/order');
 const ITEMS_PER_PAGE=2;
@@ -97,6 +97,8 @@ exports.getCart = (req, res, next) => {
     .execPopulate()
     .then(user => {
       const products = user.cart.items;
+      console.log("this is");
+      console.log(products);
       res.render('shop/cart', {
         path: '/cart',
         pageTitle: 'Your Cart',
@@ -142,10 +144,18 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
+
+// Token is created using Checkout or Elements!
+// Get the payment token ID submitted by the form:
+const token = req.body.stripeToken; // Using Express
+let total =0;
   req.user
     .populate('cart.items.productId')
     .execPopulate()
     .then(user => {
+      user.cart.items.forEach(item => {
+        total += item.quantity * item.productId.price;
+      })
       const products = user.cart.items.map(i => {
         return { quantity: i.quantity, product: { ...i.productId._doc } };
       });
@@ -159,6 +169,22 @@ exports.postOrder = (req, res, next) => {
       return order.save();
     })
     .then(result => {
+      //this information is passed to server of the stripe
+
+      //the stripe server has its own csrf token so we 
+      //cant use or passed our csrf token so
+      // we have to avoid our use of csrf token for this route
+      (async () => {
+      const charge = await stripe.charges.create({
+        amount: total,
+        currency: 'usd',
+        description: 'Your order',
+        source: token,
+        metadata: {order_id: result._id.toString()}
+      });
+    })().catch(err => {
+      console.log(err);
+    });
       return req.user.clearCart();
     })
     .then(() => {
@@ -170,6 +196,30 @@ exports.postOrder = (req, res, next) => {
       return next(error);
     });
 };
+
+exports.getCheckout = (req,res,next) => {
+  req.user
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then(user => {
+      const products = user.cart.items;
+      let total=0;
+      products.forEach(pro => {
+        total += pro.quantity * pro.productId.price;
+      })
+      res.render('shop/checkout', {
+        path: '/checkout',
+        pageTitle: 'Checkout',
+        products: products,
+        totalAmount: total
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+}
 
 exports.getOrders = (req, res, next) => {
   Order.find({ 'user.userId': req.user._id })
