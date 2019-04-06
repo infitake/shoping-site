@@ -15,7 +15,7 @@ exports.getProducts = (req, res, next) => {
     .countDocuments()
     .then(numProducts => {
       totalItems = numProducts;
-      console.log(totalItems, ITEMS_PER_PAGE, page);
+      // console.log(totalItems, ITEMS_PER_PAGE, page);
       return Product.find()
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE);
@@ -58,7 +58,7 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  console.log('inside index');
+  // console.log('inside index');
   const page = +req.query.page || 1;
   let totalItems;
 
@@ -66,7 +66,7 @@ exports.getIndex = (req, res, next) => {
     .countDocuments()
     .then(numProducts => {
       totalItems = numProducts;
-      console.log(totalItems, ITEMS_PER_PAGE, page);
+      // console.log(totalItems, ITEMS_PER_PAGE, page);
       return Product.find()
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE);
@@ -119,7 +119,7 @@ exports.postCart = (req, res, next) => {
       return req.user.addToCart(product);
     })
     .then(result => {
-      console.log(result);
+      // console.log(result);
       res.redirect('/cart');
     })
     .catch(err => {
@@ -281,20 +281,6 @@ exports.getInvoice = (req, res, next) => {
       pdfDoc.fontSize(20).text('Total Price: $' + totalPrice);
 
       pdfDoc.end();
-      // fs.readFile(invoicePath, (err, data) => {
-      //   if (err) {
-      //     return next(err);
-      //   }
-      //   res.setHeader('Content-Type', 'application/pdf');
-      //   res.setHeader(
-      //     'Content-Disposition',
-      //     'inline; filename="' + invoiceName + '"'
-      //   );
-      //   res.send(data);
-      // });
-      // const file = fs.createReadStream(invoicePath);
-
-      // file.pipe(res);
     })
     .catch(err => next(err));
 };

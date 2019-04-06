@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
   port: 25,
   auth: {
     user: 'infirao@gmail.com',
-    pass: ''
+    pass: '748452@ry'
   },
   tls: {
     rejectUnauthorized: false
@@ -137,7 +137,7 @@ exports.postSignup = (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    console.log(errors.array());
+    // console.log(errors.array());
     return res.status(422).render('auth/signup', {
       path: '/signup',
       pageTitle: 'Signup',
@@ -163,12 +163,6 @@ exports.postSignup = (req, res, next) => {
     })
     .then(result => {
       res.redirect('/login');
-      // return transporter.sendMail({
-      //   to: email,
-      //   from: 'shop@node-complete.com',
-      //   subject: 'Signup succeeded!',
-      //   html: '<h1>You successfully signed up!</h1>'
-      // });
     })
     .catch(err => {
       const error = new Error(err);
