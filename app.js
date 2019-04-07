@@ -8,7 +8,8 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
-
+const helmet = require('helmet');
+const compression = require('compression');
 const errorController = require('./controllers/error');
 const shopController = require('./controllers/shop');
 const isAuth = require('./middleware/is-auth');
@@ -16,6 +17,7 @@ const User = require('./models/user');
 
 const MONGODB_URI =
 'mongodb+srv://ravinder:mongodb@nodeapp-uivmr.mongodb.net/test';
+
 
 const app = express();
 const store = new MongoDBStore({
@@ -52,6 +54,14 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, 'access.log'),
+  { flags: 'a' }
+);
+
+app.use(helmet());
+app.use(compression()); 
+app.use(morgan('combined', { stream: accessLogStream }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
