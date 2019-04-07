@@ -1,5 +1,6 @@
 const path = require('path');
-
+const fs = require('fs');
+const https = require('https');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -9,6 +10,7 @@ const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
 const helmet = require('helmet');
+const morgan = require('morgan');
 const compression = require('compression');
 const errorController = require('./controllers/error');
 const shopController = require('./controllers/shop');
